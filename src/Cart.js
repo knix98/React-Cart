@@ -34,6 +34,37 @@ class Cart extends React.Component {
         }
     }
 
+    handleIncreaseQuantity = (product) => {
+        const {products} = this.state;
+        const index = products.indexOf(product);
+        products[index].qty++; //qty increased in the variable 'products' created above using object destructuring
+
+        this.setState({
+            products: products
+        })
+    }
+
+    handleDecreaseQuantity = (product) => {
+        const {products} = this.state;
+        const index = products.indexOf(product);
+        if(products[index].qty === 0) return;
+
+        products[index].qty--; //qty increased in the variable 'products' created above using object destructuring
+
+        this.setState({
+            products: products
+        })
+    }
+
+    handleDeleteProduct = (id) => {
+        const {products} = this.state;
+        const remainingProducts = products.filter((product) => product.id !== id);
+
+        this.setState({
+            products: remainingProducts
+        })
+    }
+
     render() {
         const { products } = this.state;
 
@@ -44,6 +75,9 @@ class Cart extends React.Component {
                         <CartItem
                             product={product} //product is passed as props to <CartItem />
                             key={product.id} //key is just for React internal purposes to differentiate among each components in the list, key is not passed as props to CartItem
+                            onIncreaseQuantity={this.handleIncreaseQuantity}
+                            onDecreaseQuantity={this.handleDecreaseQuantity}
+                            onDeleteProduct={this.handleDeleteProduct}
                         />
                     )
                 })}
