@@ -35,7 +35,7 @@ class CartItem extends React.Component {
     decreaseQuantity = () => {
         const { qty } = this.state; //object destructuring
 
-        if (qty == 0) { //no decreasing beyond 0
+        if (qty === 0) { //no decreasing beyond 0
             return;
         }
        
