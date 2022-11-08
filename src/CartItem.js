@@ -5,7 +5,7 @@ class CartItem extends React.Component {
     //constructor of class: 'CartItem'
     constructor() {
         super(); //calling the constructor of parent class is mandatory in the inheriting class
-        
+
         //defining state for CartItem component 
         this.state = {
             price: 999,
@@ -17,7 +17,33 @@ class CartItem extends React.Component {
 
     //defining a function inside class: 'CartItem'
     increaseQuantity = () => {
-        console.log('this ->', this);
+        // setState form 1 - setState function inherited from React.Component class will change the state of component as well as re render the component with the changed state
+        // this.setState({
+        //   qty: this.state.qty + 1
+        // });
+
+        // setState form 2 - if prevState required, use this
+        this.setState((prevState) => {
+            return {
+                qty: prevState.qty + 1
+            }
+        }, () => {
+            console.log('this.state', this.state);
+        });
+    }
+
+    decreaseQuantity = () => {
+        const { qty } = this.state; //object destructuring
+
+        if (qty == 0) { //no decreasing beyond 0
+            return;
+        }
+       
+        this.setState((prevState) => {
+            return {
+                qty: prevState.qty - 1
+            }
+        });
     }
 
     //for returning jsx from a class, we have to define this render function inside class: 'CartItem'
@@ -45,6 +71,7 @@ class CartItem extends React.Component {
                             alt="decrease"
                             className="action-icons"
                             src="https://cdn-icons-png.flaticon.com/128/992/992683.png"
+                            onClick={this.decreaseQuantity}
                         />
                         <img
                             alt="delete"
