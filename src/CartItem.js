@@ -2,19 +2,6 @@ import React from "react";
 
 //class 'CartItem' inherits features from class 'Component' inside the 'React' package 
 class CartItem extends React.Component {
-    //constructor of class: 'CartItem'
-    constructor() {
-        super(); //calling the constructor of parent class is mandatory in the inheriting class
-
-        //defining state for CartItem component 
-        this.state = {
-            price: 999,
-            title: 'Mobile Phone',
-            qty: 1,
-            img: ''
-        }
-    }
-
     //defining a function inside class: 'CartItem'
     increaseQuantity = () => {
         // setState form 1 - setState function inherited from React.Component class will change the state of component as well as re render the component with the changed state
@@ -48,7 +35,8 @@ class CartItem extends React.Component {
 
     //for returning jsx from a class, we have to define this render function inside class: 'CartItem'
     render() {
-        const { price, title, qty } = this.state; //object destructuring, this.state is defined above in the constructor
+        console.log(this.props)
+        const { price, title, qty } = this.props.product; //object destructuring, product was passed as props to CartItem in Cart.js
 
         return (
             <div className="cart-item">
