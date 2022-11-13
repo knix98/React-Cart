@@ -35,7 +35,6 @@ class CartItem extends React.Component {
 
     //for returning jsx from a class, we have to define this render function inside class: 'CartItem'
     render() {
-        console.log(this.props)
         const { price, title, qty } = this.props.product; //object destructuring, product was passed as props to CartItem in Cart.js
         const { product, onIncreaseQuantity, onDecreaseQuantity, onDeleteProduct } = this.props;
 

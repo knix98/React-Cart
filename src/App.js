@@ -1,6 +1,8 @@
 import React from "react";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
+import db from './index';
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 
 class App extends React.Component {
   //constructor of class: 'App'
@@ -9,77 +11,95 @@ class App extends React.Component {
 
     //defining state for App component 
     this.state = {
-        products: [
-            {
-                price: 999,
-                title: 'Mobile Phone',
-                qty: 1,
-                img: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bW9iaWxlJTIwcGhvbmV8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-                id: 1
-            },
-            {
-                price: 99,
-                title: 'Camera',
-                qty: 10,
-                img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FtZXJhfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-                id: 2
-            },
-            {
-                price: 999,
-                title: 'Laptop',
-                qty: 4,
-                img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-                id: 3
-            }
-        ]
+      products: [],
+      loading: true //implies that products are being fetched from firebase
     }
   }
 
-  handleIncreaseQuantity = (product) => {
-      const {products} = this.state;
-      const index = products.indexOf(product);
-      products[index].qty++; //qty increased in the variable 'products' created above using object destructuring
+  componentDidMount() {
+    const colRef = collection(db, "products"); //getting a reference to the collection - 'products'
 
-      this.setState({
-          products: products
+    // getDocs(colRef) //getting all documents inside 'products' collection, getDocs returns a promise with the resolved snapshot
+    //   .then((snapshot) => {
+    //     //snapshot.docs is an array containing all the docs 
+    //     const products = snapshot.docs.map((doc) => {
+    //       const product = doc.data(); //doc.data() will return us an object containing only the fields assigned by us inside each document
+    //       product.id = doc.id; //adding the id field to the product as well, doc.id is the auto id generated 
+
+    //       return product;
+    //     })
+
+    //     this.setState({ //assigning the products array made above to state.products
+    //       products: products,
+    //       loading: false
+    //     })
+    //   })
+
+
+    //real-time data collection using onSnapshot
+    //onSnapshot function is fired whenever there is a change in any document in the connected firestore
+    //so this way we won't have to refresh the page to see the change in UI, it will get changed by itself
+    onSnapshot(colRef, (snapshot) => {
+      //snapshot.docs is an array containing all the docs 
+      const products = snapshot.docs.map((doc) => {
+        const product = doc.data(); //doc.data() will return us an object containing only the fields assigned by us inside each document
+        product.id = doc.id; //adding the id field to the product as well, doc.id is the auto id generated 
+
+        return product;
       })
+
+      this.setState({ //assigning the products array made above to state.products
+        products: products,
+        loading: false
+      })
+    });
+  }
+
+  handleIncreaseQuantity = (product) => {
+    const { products } = this.state;
+    const index = products.indexOf(product);
+    products[index].qty++; //qty increased in the variable 'products' created above using object destructuring
+
+    this.setState({
+      products: products
+    })
   }
 
   handleDecreaseQuantity = (product) => {
-      const {products} = this.state;
-      const index = products.indexOf(product);
-      if(products[index].qty === 0) return;
+    const { products } = this.state;
+    const index = products.indexOf(product);
+    if (products[index].qty === 0) return;
 
-      products[index].qty--; //qty increased in the variable 'products' created above using object destructuring
+    products[index].qty--; //qty increased in the variable 'products' created above using object destructuring
 
-      this.setState({
-          products: products
-      })
+    this.setState({
+      products: products
+    })
   }
 
   handleDeleteProduct = (id) => {
-      const {products} = this.state;
-      const remainingProducts = products.filter((product) => product.id !== id);
+    const { products } = this.state;
+    const remainingProducts = products.filter((product) => product.id !== id);
 
-      this.setState({
-          products: remainingProducts
-      })
+    this.setState({
+      products: remainingProducts
+    })
   }
 
   getCartCount = () => {
-      const {products} = this.state;
+    const { products } = this.state;
 
-      let count = 0;
+    let count = 0;
 
-      products.forEach((product) => {
-        count += product.qty;
-      })
+    products.forEach((product) => {
+      count += product.qty;
+    })
 
-      return count;
+    return count;
   }
 
   getCartTotal = () => {
-    const {products} = this.state;
+    const { products } = this.state;
     let total = 0;
     products.forEach((prod) => {
       total += prod.qty * prod.price;
@@ -89,17 +109,18 @@ class App extends React.Component {
   }
 
   render() {
-    const {products} = this.state;
+    const { products, loading } = this.state;
     return (
       <div className="App">
         <Navbar count={this.getCartCount()} />  {/*calculating and passing the count of products as props to Navbar*/}
-        <Cart 
+        <Cart
           products={products}
           onIncreaseQuantity={this.handleIncreaseQuantity}
           onDecreaseQuantity={this.handleDecreaseQuantity}
           onDeleteProduct={this.handleDeleteProduct}
         />
-        <div style={{fontSize: 20, marginLeft: 10}}>TOTAL: {this.getCartTotal()}</div>
+        {loading && <h2>Loading Products...</h2>}  {/*will show <h2> initially and when componentDidMount rerenders with loading: false, then <h2> will go away*/}
+        <div style={{ fontSize: 20, marginLeft: 10 }}>TOTAL: {this.getCartTotal()}</div>
       </div>
     );
   }
