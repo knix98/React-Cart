@@ -2,7 +2,7 @@ import React from "react";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
 import db from './index';
-import { collection, doc, getDocs, addDoc, updateDoc, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot } from "firebase/firestore";
 
 class App extends React.Component {
   //constructor of class: 'App'
@@ -64,7 +64,7 @@ class App extends React.Component {
     //   products: products
     // })
 
-    const docRef = doc(db, 'products', products[index].id);
+    const docRef = doc(db, 'products', products[index].id); //getting the doc to be updated
 
     updateDoc(docRef, {
       qty: products[index].qty + 1
@@ -98,12 +98,20 @@ class App extends React.Component {
   }
 
   handleDeleteProduct = (id) => {
-    const { products } = this.state;
-    const remainingProducts = products.filter((product) => product.id !== id);
+    // const { products } = this.state;
+    // const remainingProducts = products.filter((product) => product.id !== id);
 
-    this.setState({
-      products: remainingProducts
+    // this.setState({
+    //   products: remainingProducts
+    // })
+
+    const docRef = doc(db, 'products', id); //getting the doc to be deleted
+    
+    deleteDoc(docRef)
+    .then(() => {
+      console.log('Product deleted successfully');
     })
+    .catch((err) => {console.log(err.message)});
   }
 
   getCartCount = () => {
@@ -132,7 +140,7 @@ class App extends React.Component {
     const colRef = collection(db, "products");
 
     addDoc(colRef, {
-      img: '',
+      img: 'https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FzaGluZyUyMG1hY2hpbmV8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
       price: 900,
       qty: 3,
       title: 'washing machine'
