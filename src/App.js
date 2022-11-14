@@ -2,7 +2,7 @@ import React from "react";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
 import db from './index';
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, addDoc, onSnapshot } from "firebase/firestore";
 
 class App extends React.Component {
   //constructor of class: 'App'
@@ -108,11 +108,27 @@ class App extends React.Component {
     return total;
   }
 
+  addProduct = () => {
+    const colRef = collection(db, "products");
+
+    addDoc(colRef, {
+      img: '',
+      price: 900,
+      qty: 3,
+      title: 'washing machine'
+    })
+    .then((docRef) => {  //docRef is the reference to the new doc that was just added to firebase
+      console.log(docRef);
+    })
+    .catch((err) => {console.log(err)});
+  }
+
   render() {
     const { products, loading } = this.state;
     return (
       <div className="App">
         <Navbar count={this.getCartCount()} />  {/*calculating and passing the count of products as props to Navbar*/}
+        <button onClick={this.addProduct}>Add a product</button>
         <Cart
           products={products}
           onIncreaseQuantity={this.handleIncreaseQuantity}
