@@ -2,7 +2,7 @@ import React from "react";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
 import db from './index';
-import { collection, getDocs, addDoc, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, addDoc, updateDoc, onSnapshot } from "firebase/firestore";
 
 class App extends React.Component {
   //constructor of class: 'App'
@@ -58,11 +58,21 @@ class App extends React.Component {
   handleIncreaseQuantity = (product) => {
     const { products } = this.state;
     const index = products.indexOf(product);
-    products[index].qty++; //qty increased in the variable 'products' created above using object destructuring
+    // products[index].qty++; //qty increased in the variable 'products' created above using object destructuring
 
-    this.setState({
-      products: products
+    // this.setState({
+    //   products: products
+    // })
+
+    const docRef = doc(db, 'products', products[index].id);
+
+    updateDoc(docRef, {
+      qty: products[index].qty + 1
     })
+    .then(() => {
+      console.log('Quantity of', products[index].title, 'increased successfully');
+    })
+    .catch((err) => {console.log(err.message)});
   }
 
   handleDecreaseQuantity = (product) => {
@@ -70,11 +80,21 @@ class App extends React.Component {
     const index = products.indexOf(product);
     if (products[index].qty === 0) return;
 
-    products[index].qty--; //qty increased in the variable 'products' created above using object destructuring
+    // products[index].qty--; //qty increased in the variable 'products' created above using object destructuring
 
-    this.setState({
-      products: products
+    // this.setState({
+    //   products: products
+    // })
+
+    const docRef = doc(db, 'products', products[index].id);
+
+    updateDoc(docRef, {
+      qty: products[index].qty - 1
     })
+    .then(() => {
+      console.log('Quantity of', products[index].title, 'decreased successfully');
+    })
+    .catch((err) => {console.log(err.message)});
   }
 
   handleDeleteProduct = (id) => {
